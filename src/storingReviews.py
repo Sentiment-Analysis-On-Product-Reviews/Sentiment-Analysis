@@ -10,54 +10,44 @@ import pandas as pd
 from bs4 import BeautifulSoup
 
 
-search_query = input("Enter your product for getting reviews: ")
+class StoringReviews:
+    def __init__(self):
+        self.search_query = input("Enter your product for getting reviews: ")
 
-gettingReviews = ExtractingReviews(search_query)
+    def storeReviews(self):
 
-data_asin = []
-link = []
-reviews = []
+        gettingReviews = ExtractingReviews(self.search_query)
 
-response = gettingReviews.getAmazonSearch()
+        data_asin = []
+        link = []
+        reviews = []
 
-# print(response)
-soup = BeautifulSoup(response.content, features="lxml")
-tags = {tag.name for tag in soup.find_all()}
-# print(tags)
-for tag in tags:
+        response = gettingReviews.getAmazonSearch()
 
-    # find all element of tag
-    for i in soup.find_all(tag):
-
-        # if tag has attribute of class
-        if i.has_attr("data-asin"):
-
-            if len(i['data-asin']) != 0:
-                data_asin.append("".join(i['data-asin']))
-
-# print(data_asin)
-
-for i in range(2, 4):
-    response = gettingReviews.searchASIN(data_asin[i])
-    # print(response)
-    soup = BeautifulSoup(response.content, features="lxml")
-    for i in soup.findAll("a", {'data-hook': "see-all-reviews-link-foot"}):
-        link.append(i['href'])
-
-# print(link)
-
-for j in range(len(link)):
-    for k in range(25):
-        response = gettingReviews.searchReviews(link[j]+'&pageNumber='+str(k))
-        #response = response.text
         soup = BeautifulSoup(response.content, features="lxml")
-        for i in soup.findAll("span", {'data-hook': "review-body"}):
-            reviews.append(i.text)
-# print(reviews)
+        tags = {tag.name for tag in soup.find_all()}
 
-rev = {'reviews': reviews}  # converting the reviews list into a dictionary
-# converting this dictionary into a dataframe
-review_data = pd.DataFrame.from_dict(rev)
-review_data.to_csv('Scraping reviews.csv', index=False)
+        for tag in tags:
+            for i in soup.find_all(tag):
+                if i.has_attr("data-asin"):
+                    if len(i['data-asin']) != 0:
+                        data_asin.append("".join(i['data-asin']))
 
-print(review_data.head())
+        for i in range(2, 4):
+            response = gettingReviews.searchASIN(data_asin[i])
+            soup = BeautifulSoup(response.content, features="lxml")
+            for i in soup.findAll("a", {'data-hook': "see-all-reviews-link-foot"}):
+                link.append(i['href'])
+
+        for j in range(len(link)):
+            for k in range(15):
+                response = gettingReviews.searchReviews(
+                    link[j]+'&pageNumber='+str(k))
+                soup = BeautifulSoup(response.content, features="lxml")
+                for i in soup.findAll("span", {'data-hook': "review-body"}):
+                    reviews.append(i.text)
+
+        rev = {'reviews': reviews}
+        review_data = pd.DataFrame.from_dict(rev)
+
+        return review_data, reviews

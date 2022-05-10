@@ -4,6 +4,7 @@ Created on Tue Apr 19 22:38:28 2022
 
 @author: AneeshDixit
 """
+
 import requests
 
 
@@ -24,7 +25,8 @@ class ExtractingReviews:
                        'sec-gpc': '1',
                        'service-worker-navigation-preload': 'true',
                        'upgrade-insecure-requests': '1',
-                       'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36'}
+                       'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36'
+                       }
 
     def getAmazonSearch(self):
         url = "https://www.amazon.in/s?k="+self.search_query
@@ -37,7 +39,6 @@ class ExtractingReviews:
 
     def searchASIN(self, asin):
         url = "https://www.amazon.in/dp/"+asin
-        print(url)
         page = requests.get(url, headers=self.header)
         if(page.status_code == 200):
             return page
@@ -46,7 +47,6 @@ class ExtractingReviews:
 
     def searchReviews(self, review_link):
         url = "https://www.amazon.in"+review_link
-        print(url)
         page = requests.get(url, headers=self.header)
         if(page.status_code == 200):
             return page
